@@ -1,0 +1,15 @@
+Steps to setup the Project
+
+1) Install the following from the nuget packet manager
+	- StructureMap.WebApi2
+	- Structuremap
+	- ServiceStack.Redis
+	
+2) Once you start the project if you have a error message "Could not load file or assembly 'System.Web.Mvc' or one of its dependencies." . It will be the System.Mvc version that is in your Visual Studio. You need to update that in the Web.Config file.
+
+3) I have used to redis to maintain in-memory storage. So you need to run the redis-server.exe and redis-cli.exe in order to run redis and monitor the data inside it.
+
+4) For the Unit Test, You need to install moq and reference the LibApp Project.
+
+
+ 
