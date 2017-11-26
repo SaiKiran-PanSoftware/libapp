@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>Library Application</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="index.js"></script>
+</head>
+<body ng-controller="MainController">
+    <nav class="navbar navbar-inverse w3-bar w3-light-grey">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">In House Library Application</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a href="#" ng-click="showBooks()">Books</a></li>
+                <li><a href="#" ng-click="showBorrowers()">Borrowers</a></li>
+                <li><a href="#" ng-click="showPendingBooks()">Pending Books</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="container" ng-if="selectedOption == 'Books'">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bookModal">Add New Book</button>
+            <input type="text" ng-model="vm.searchBook" />
+            <br />
+            <br />
+            <table class="table table-condensed">
+                <tr>
+                    <th>Author</th>
+                    <th>Title</th>
+                    <th>Available</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="book in books">
+                    <td>{{ book.Author }}</td>
+                    <td>{{ book.Title }}</td>
+                    <td>
+                        <p ng-if="book.IsAvailable"> YES </p>
+                        <p ng-if="!book.IsAvailable"> NO </p>
+                    </td>
+                    <td ng-if="book.IsAvailable"> <button type="button" class="btn btn-success" data-toggle="modal" data-target="#borrowBookModal">Borrow</button> </td>
+                    <td ng-if="!book.IsAvailable"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="container" ng-if="selectedOption == 'Borrowers'">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#borrowerModal">Add New Borrower</button>
+            <br />
+            <br />
+            <table class="table table-condensed">
+                <tr>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="borrower in borrowers">
+                    <td>{{ borrower.FirstName }}</td>
+                    <td>{{ borrower.LastName }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div ng-if="selectedOption == 'PendingBooks'">            
+            <table class="table table-condensed">
+                <tr>
+                    <th>Borrower</th>
+                    <th>Book Author</th>
+                    <th>Book Title</th>
+                    <th>Date Borrowed</th>
+                </tr>
+                <tr ng-repeat="pendingBook in pendingBooks">
+                    <td>{{ pendingBook.Borrower.FirstName }}</td>
+                    <td>{{ pendingBook.Book.Author }}</td>
+                    <td>{{ pendingBook.Book.Title }}</td>
+                    <td>{{ pendingBook.DateBorrowed | date}}</td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div ng-if="!selectedOption">
+            <img class="img-responsive" src="/Resources/LibraryImage.jpg" alt="Chania" width="500" height="345"> 
+            <!--message : {{message}}
+            <button ng-click="addBook()">Add Book</button>-->
+        </div>
+        <!--Modals-->
+
+        <div class="modal fade" id="borrowerModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New Borrower</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                First name: <input type="text" class="form-control" ng-model="firstName" name="FirstName"><br>
+                            </div>
+                            <div class="col-sm-6">
+                                Last name: <input type="text" class="form-control" ng-model="lastName" name="LastName"><br>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" ng-click="addNewBorrower()" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Borrower-->
+        <div class="modal fade" id="borrowBookModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Borrow Book</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="borrowBookForm" name="borrowBookForm" novalidate>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <select required class="form-control" ng-model="selectedBorrower" ng-options="borrower.FirstName for borrower in borrowers">
+                                        <option value="" selected disabled>Please select a Borrower</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <select required class="form-control" ng-model="selectedBook" ng-options="book.Title for book in books">
+                                        <option value="" selected disabled>Please select a Book</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" ng-click="borrowBook()" data-dismiss="modal" ng-disabled="borrowBookForm.$invalid">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="resetSelectedValues()">Close</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Book-->
+        <div class="modal fade" id="bookModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New Book</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="bookForm" name="bookForm" novalidate>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    Author : <input type="text" required class="form-control" ng-model="bookAuthor" name="BookAuthor"><br>
+                                </div>
+                                <div class="col-sm-6">
+                                    Title : <input type="text" required class="form-control" ng-model="bookTitle" name="BookTitle"><br>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" ng-click="addBook()" data-dismiss="modal" ng-disabled="bookForm.$invalid">Save</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
